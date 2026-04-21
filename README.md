@@ -137,7 +137,13 @@ We report link prediction performance in terms of **MRR**, **Hits@1**, and **Hit
 
 
 
+## Feature Correlation Matrix
 
+The full correlation matrix across semantic, structural, and spectral graph features is provided as a figure for readability.
+
+![Correlation Matrix](figures/correlation_matrix.png)
+
+For the complete numeric version, see the files in the `results/` directory.
 
 
 
