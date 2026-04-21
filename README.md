@@ -89,21 +89,51 @@ The overall workflow of the paper is:
 
 A typical repository layout is as follows:
 
-```text
-.
-├── data/          # datasets or dataset processing files
-├── src/           # source code for metric computation and analysis
-├── scripts/       # experiment and utility scripts
-├── results/       # generated outputs, tables, and statistics
-├── figures/       # plots and images used in the paper
-├── notebooks/     # exploratory notebooks (if any)
-└── README.md
+
+
+
+## Reproducibility  
+This repository is intended to support reproduction of the main findings reported in the paper, including:
+
+- sensitivity analysis of CSG with respect to the k parameter
+- analysis of CSG under different class sampling sizes
+- correlation analysis between complexity metrics and downstream link prediction performance
+- complexity comparisons across widely used benchmark datasets
+  
+## Why This Work Matters  
+Knowledge graph benchmark performance varies widely across datasets, but standard evaluation metrics alone do not explain why one dataset is harder than another. This work provides a more principled view of dataset difficulty by comparing spectral, semantic, and structural complexity measures. The results suggest that semantic ambiguity and structural connectivity are more reliable indicators of KG difficulty than CSG alone.
 
 
 
 
 
 
+## Benchmark Results
+
+We report link prediction performance in terms of **MRR**, **Hits@1**, and **Hits@10** across multiple standard knowledge graph datasets.
+
+<details>
+<summary>Show benchmark performance table</summary>
+
+| Model | WN18 MRR | WN18 H@1 | WN18 H@10 | FB15k-237 MRR | FB15k-237 H@1 | FB15k-237 H@10 | WN18RR MRR | WN18RR H@1 | WN18RR H@10 | YAGO3-10 MRR | YAGO3-10 H@1 | YAGO3-10 H@10 | CoDEx-M MRR | CoDEx-M H@1 | CoDEx-M H@10 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| DistMult | 0.824 | 0.726 | 0.9461 | 0.313 | 0.224 | 0.4901 | 0.433 | 0.397 | 0.5022 | 0.501 | 0.413 | 0.6612 | 0.379 | 0.328 | 0.479 |
+| ComplEx | 0.949 | 0.945 | 0.9550 | 0.349 | 0.257 | 0.5297 | 0.458 | 0.426 | 0.5212 | 0.576 | 0.505 | 0.7035 | 0.373 | 0.331 | 0.453 |
+| ANALOGY | 0.934 | 0.926 | 0.9442 | 0.202 | 0.126 | 0.3538 | 0.366 | 0.358 | 0.3800 | 0.283 | 0.192 | 0.4565 | 0.314 | 0.246 | 0.441 |
+| SimplE | 0.938 | 0.933 | 0.9458 | 0.179 | 0.100 | 0.3435 | 0.398 | 0.383 | 0.4265 | 0.453 | 0.356 | 0.6316 | 0.255 | 0.189 | 0.376 |
+| HolE | 0.938 | 0.931 | 0.9494 | 0.303 | 0.214 | 0.4764 | 0.432 | 0.403 | 0.4879 | 0.502 | 0.418 | 0.6519 | -- | -- | -- |
+| TuckER | 0.951 | 0.946 | 0.9580 | 0.352 | 0.259 | 0.5361 | 0.459 | 0.430 | 0.5140 | 0.544 | 0.466 | 0.6809 | 0.328 | 0.259 | 0.458 |
+| TransE | 0.646 | 0.406 | 0.9487 | 0.310 | 0.217 | 0.4965 | 0.206 | 0.028 | 0.5623 | 0.401 | 0.378 | 0.5739 | 0.435 | 0.368 | 0.562 |
+| STransE | 0.656 | 0.432 | 0.9345 | 0.315 | 0.225 | 0.4956 | 0.326 | 0.101 | 0.4221 | 0.049 | 0.328 | 0.0735 | -- | -- | -- |
+| CrossE | 0.834 | 0.733 | 0.9503 | 0.298 | 0.212 | 0.4705 | 0.405 | 0.381 | 0.4499 | 0.446 | 0.331 | 0.6545 | -- | -- | -- |
+| TorusE | 0.947 | 0.743 | 0.9544 | 0.281 | 0.196 | 0.4471 | 0.463 | 0.427 | 0.5335 | 0.342 | 0.274 | 0.4744 | -- | -- | -- |
+| RotatE | 0.949 | 0.943 | 0.9602 | 0.336 | 0.238 | 0.5306 | 0.475 | 0.426 | 0.5735 | 0.498 | 0.405 | 0.6707 | 0.478 | 0.418 | 0.593 |
+| ConvE | 0.945 | 0.939 | 0.9568 | 0.305 | 0.214 | 0.4762 | 0.427 | 0.390 | 0.5075 | 0.488 | 0.399 | 0.6575 | 0.318 | 0.239 | 0.464 |
+| ConvKB | 0.709 | 0.529 | 0.9489 | 0.230 | 0.140 | 0.4146 | 0.398 | 0.585 | 0.6525 | 0.420 | 0.322 | 0.6047 | -- | -- | -- |
+| ConvR | 0.950 | 0.946 | 0.9585 | 0.346 | 0.256 | 0.5263 | 0.4998 | 0.468 | 0.5987 | 0.4232 | 0.412 | 0.5766 | -- | -- | -- |
+| RSN | 0.928 | 0.912 | 0.9510 | 0.280 | 0.198 | 0.4444 | 0.498 | 0.399 | 0.5834 | 0.441 | 0.409 | 0.6043 | -- | -- | -- |
+
+</details>
 
 
 
