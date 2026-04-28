@@ -191,11 +191,6 @@ results/
 └── transe_csg_similarity_matrix.csv
 ```
 
-## Notes on the Recovered Legacy Code
-
-The original scripts in `legacy/` are included exactly as recovered. They contain hard-coded local paths from the original machine and may require editing before direct execution. The portable implementation in `src/kg_complexity/` replaces those hard-coded paths with command-line arguments and adds a dependency-managed package structure suitable for GitHub.
-
-
 
 ## Repository Structure
 
