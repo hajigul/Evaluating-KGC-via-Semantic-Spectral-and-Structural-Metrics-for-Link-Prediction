@@ -25,52 +25,8 @@ The paper is available on IEEE Xplore:
 Understanding dataset complexity is fundamental to evaluating and comparing link prediction models on knowledge graphs (KGs). While the Cumulative Spectral Gradient (CSG) metric, derived from probabilistic divergence between classes within a spectral clustering framework, has been proposed as a classifier-agnostic complexity metric that scales with class cardinality and correlates with downstream performance, it has not been evaluated in KG settings. In this work, we critically examine CSG in the context of multi-relational link prediction, incorporating semantic representations via transformer-derived embeddings. Contrary to prior claims, we find that CSG is highly sensitive to parameterization and does not robustly scale with the number of classes. Moreover, it exhibits weak or inconsistent correlation with standard performance metrics such as Mean Reciprocal Rank (MRR) and Hits@1. To deepen the analysis, we introduce and benchmark a set of structural and semantic KG complexity metrics. Our findings reveal that global and local relational ambiguity, captured via Relation Entropy, node-level Maximum Relation Diversity, and Relation Type Cardinality, exhibit strong inverse correlations with MRR and Hits@1, suggesting these as more faithful indicators of task difficulty. Conversely, graph connectivity measures such as Average Degree, Degree Entropy, PageRank, and Eigenvector Centrality correlate positively with Hits@10. Our results demonstrate that CSG’s purported stability and generalization-predictive power do not hold in link-prediction settings, and underscore the need for more stable, interpretable, and task-aligned measures of dataset complexity in knowledge-driven learning.
 
 
-## What This Repository Contains
 
-This repository provides a clean, portable implementation of the main analyses used in the paper:
-
-- **Semantic complexity metrics**: Relation Entropy, Maximum Relation Diversity, and Relation Type Cardinality.
-- **Structural complexity metrics**: Average Degree, Degree Entropy, PageRank statistics, Eigenvector Centrality statistics, graph density, and connected component statistics.
-- **Spectral complexity metrics**: Cumulative Spectral Gradient (CSG) using deterministic hash embeddings or BERT embeddings.
-- **TransE-based CSG**: A lightweight TransE training pipeline followed by CSG computation.
-- **Legacy scripts**: The recovered original scripts are preserved in `legacy/` for traceability.
-
-## Repository Structure
-
-```text
-kg-complexity-metrics/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── pyproject.toml
-├── examples/
-│   └── sample_kg/
-│       ├── train.txt
-│       ├── valid.txt
-│       └── test.txt
-├── legacy/
-│   ├── CSG_R_based.py
-│   ├── CSG_diff_M2.py
-│   ├── r_CSG_TransE.py
-│   ├── spec_analysis_v4.py
-│   └── IEEE_BigData__Complexity_Paper_.pdf
-├── results/
-├── scripts/
-│   └── run_all_metrics.py
-├── tests/
-│   └── test_smoke.py
-└── src/
-    └── kg_complexity/
-        ├── __init__.py
-        ├── cli.py
-        ├── csg.py
-        ├── embeddings.py
-        ├── io.py
-        ├── metrics.py
-        └── transe.py
-```
-
-## Installation
+## How to run the code:
 
 ### 1. Clone the repository
 
@@ -166,32 +122,6 @@ kg-complexity transe-csg \
   --out-dir results/sample_transe_csg
 ```
 
-## Reproducing Paper-Style Experiments
-
-Place benchmark datasets such as `FB15k-237`, `WN18RR`, `CoDEx-S`, `CoDEx-M`, and `CoDEx-L` under a common folder:
-
-```text
-datasets/
-├── FB15k-237/
-│   ├── train.txt
-│   ├── valid.txt
-│   └── test.txt
-├── WN18RR/
-└── CoDEx-S/
-```
-
-Run structural and semantic metrics:
-
-```bash
-for d in datasets/*; do
-  name=$(basename "$d")
-  kg-complexity summarize \
-    --data-dir "$d" \
-    --name "$name" \
-    --out "results/${name}_metrics.csv"
-done
-```
-
 Run CSG with BERT embeddings:
 
 ```bash
@@ -265,48 +195,61 @@ results/
 
 The original scripts in `legacy/` are included exactly as recovered. They contain hard-coded local paths from the original machine and may require editing before direct execution. The portable implementation in `src/kg_complexity/` replaces those hard-coded paths with command-line arguments and adds a dependency-managed package structure suitable for GitHub.
 
-## Citation
 
-If you use this code, please cite the paper:
+
+## Repository Structure
+
+```text
+kg-complexity-metrics/
+├── README.md
+├── LICENSE
+├── requirements.txt
+├── pyproject.toml
+├── examples/
+│   └── sample_kg/
+│       ├── train.txt
+│       ├── valid.txt
+│       └── test.txt
+├── legacy/
+│   ├── CSG_R_based.py
+│   ├── CSG_diff_M2.py
+│   ├── r_CSG_TransE.py
+│   ├── spec_analysis_v4.py
+│   └── IEEE_BigData__Complexity_Paper_.pdf
+├── results/
+├── scripts/
+│   └── run_all_metrics.py
+├── tests/
+│   └── test_smoke.py
+└── src/
+    └── kg_complexity/
+        ├── __init__.py
+        ├── cli.py
+        ├── csg.py
+        ├── embeddings.py
+        ├── io.py
+        ├── metrics.py
+        └── transe.py
+```
+
+
+
+## How to cite:
+
+If you use this repository, please cite:
 
 ```bibtex
-@inproceedings{gul2025kgcomplexity,
-  title={Evaluating Knowledge Graph Complexity via Semantic, Spectral, and Structural Metrics for Link Prediction},
+@INPROCEEDINGS{11401467,
   author={Gul, Haji and Naim, Abdul Ghani and Bhat, Ajaz Ahmad},
   booktitle={2025 IEEE International Conference on Big Data (BigData)},
-  year={2025}
+  title={Evaluating Knowledge Graph Complexity via Semantic, Spectral, and Structural Metrics for Link Prediction},
+  year={2025},
+  pages={2833-2842},
+  keywords={Correlation;Sensitivity;Semantics;Knowledge graphs;Predictive models;Performance metrics;Entropy;Data models;Complexity theory;Standards;Knowledge Graph Complexity; Link Prediction; CSG; Semantic Ambiguity;Structural Connectivity;Dataset Difficulty},
+  doi={10.1109/BigData66926.2025.11401467}
 }
 ```
 
-## Testing
-
-```bash
-pip install pytest
-pytest
-```
-
-## Troubleshooting
-
-### BERT model download fails
-
-The first BERT run downloads model files from Hugging Face. Make sure you have internet access, or use:
-
-```bash
-kg-complexity csg --data-dir examples/sample_kg --embedding-method hash
-```
-
-### FAISS is not installed
-
-The package automatically falls back to scikit-learn nearest neighbors if FAISS is unavailable.
-
-### CUDA runs out of memory
-
-Use CPU mode or reduce batch size:
-
-```bash
-kg-complexity csg --data-dir datasets/FB15k-237 --embedding-method bert --device cpu --batch-size 16
-```
 
 ## License
-
 MIT License.
