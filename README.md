@@ -24,138 +24,289 @@ The paper is available on IEEE Xplore:
 
 Understanding dataset complexity is fundamental to evaluating and comparing link prediction models on knowledge graphs (KGs). While the Cumulative Spectral Gradient (CSG) metric, derived from probabilistic divergence between classes within a spectral clustering framework, has been proposed as a classifier-agnostic complexity metric that scales with class cardinality and correlates with downstream performance, it has not been evaluated in KG settings. In this work, we critically examine CSG in the context of multi-relational link prediction, incorporating semantic representations via transformer-derived embeddings. Contrary to prior claims, we find that CSG is highly sensitive to parameterization and does not robustly scale with the number of classes. Moreover, it exhibits weak or inconsistent correlation with standard performance metrics such as Mean Reciprocal Rank (MRR) and Hits@1. To deepen the analysis, we introduce and benchmark a set of structural and semantic KG complexity metrics. Our findings reveal that global and local relational ambiguity, captured via Relation Entropy, node-level Maximum Relation Diversity, and Relation Type Cardinality, exhibit strong inverse correlations with MRR and Hits@1, suggesting these as more faithful indicators of task difficulty. Conversely, graph connectivity measures such as Average Degree, Degree Entropy, PageRank, and Eigenvector Centrality correlate positively with Hits@10. Our results demonstrate that CSG’s purported stability and generalization-predictive power do not hold in link-prediction settings, and underscore the need for more stable, interpretable, and task-aligned measures of dataset complexity in knowledge-driven learning.
 
+
 ## What This Repository Contains
 
-This repository contains materials related to the paper, including:
+This repository provides a clean, portable implementation of the main analyses used in the paper:
 
-- implementations of **spectral**, **semantic**, and **structural** KG complexity metrics
-- analysis of **relation-based CSG (r-CSG)** and **tail-based CSG (t-CSG)**
-- benchmark-level complexity profiling for standard KG datasets
-- correlation analysis between complexity metrics and link prediction performance
-- figures, tables, and experiment outputs supporting the paper
-
-## Complexity Metrics Studied
-
-### Spectral Metrics
-- Relation-based Cumulative Spectral Gradient (**r-CSG**)
-- Tail-based Cumulative Spectral Gradient (**t-CSG**)
-- Spectral Gap
-- Algebraic Connectivity
-
-### Semantic Metrics
-- Relation Entropy
-- Relation Type Cardinality
-- Maximum Relation Diversity
-
-### Structural Metrics
-- Average Degree
-- Degree Entropy
-- Degree Centrality
-- Betweenness Centrality
-- Closeness Centrality
-- Eigenvector Centrality
-- PageRank
-- Clustering Coefficients
-- Modularity
-- Structural Entropy
-- Other graph-theoretic properties used in the paper
-
-## Datasets
-
-The study evaluates standard knowledge graph benchmarks, including:
-
-- **FB15k-237**
-- **WN18RR**
-- **CoDEx-S**
-- **CoDEx-M**
-- **CoDEx-L**
-- **WN18**
-- **YAGO3-10**
-
-These datasets are used to examine how different complexity measures relate to downstream link prediction performance.
-
-## Methodology Summary
-
-The overall workflow of the paper is:
-
-1. Represent knowledge graph triples as structured inputs for spectral, semantic, and structural analysis.
-2. Compute **relation-based** and **tail-based** CSG using transformer-derived semantic embeddings.
-3. Extract semantic complexity measures such as relation entropy and relation diversity.
-4. Extract structural graph measures such as degree statistics and centrality measures.
-5. Compare all complexity measures against link prediction performance metrics such as **MRR**, **Hits@1**, and **Hits@10**.
-6. Identify which metrics best reflect the intrinsic difficulty of a KG dataset.
+- **Semantic complexity metrics**: Relation Entropy, Maximum Relation Diversity, and Relation Type Cardinality.
+- **Structural complexity metrics**: Average Degree, Degree Entropy, PageRank statistics, Eigenvector Centrality statistics, graph density, and connected component statistics.
+- **Spectral complexity metrics**: Cumulative Spectral Gradient (CSG) using deterministic hash embeddings or BERT embeddings.
+- **TransE-based CSG**: A lightweight TransE training pipeline followed by CSG computation.
+- **Legacy scripts**: The recovered original scripts are preserved in `legacy/` for traceability.
 
 ## Repository Structure
 
-A typical repository layout is as follows:
+```text
+kg-complexity-metrics/
+├── README.md
+├── LICENSE
+├── requirements.txt
+├── pyproject.toml
+├── examples/
+│   └── sample_kg/
+│       ├── train.txt
+│       ├── valid.txt
+│       └── test.txt
+├── legacy/
+│   ├── CSG_R_based.py
+│   ├── CSG_diff_M2.py
+│   ├── r_CSG_TransE.py
+│   ├── spec_analysis_v4.py
+│   └── IEEE_BigData__Complexity_Paper_.pdf
+├── results/
+├── scripts/
+│   └── run_all_metrics.py
+├── tests/
+│   └── test_smoke.py
+└── src/
+    └── kg_complexity/
+        ├── __init__.py
+        ├── cli.py
+        ├── csg.py
+        ├── embeddings.py
+        ├── io.py
+        ├── metrics.py
+        └── transe.py
+```
 
+## Installation
 
+### 1. Clone the repository
 
+```bash
+git clone https://github.com/YOUR_USERNAME/kg-complexity-metrics.git
+cd kg-complexity-metrics
+```
 
-## Reproducibility  
-This repository is intended to support reproduction of the main findings reported in the paper, including:
+### 2. Create a virtual environment
 
-- sensitivity analysis of CSG with respect to the k parameter
-- analysis of CSG under different class sampling sizes
-- correlation analysis between complexity metrics and downstream link prediction performance
-- complexity comparisons across widely used benchmark datasets
-  
-## Why This Work Matters  
-Knowledge graph benchmark performance varies widely across datasets, but standard evaluation metrics alone do not explain why one dataset is harder than another. This work provides a more principled view of dataset difficulty by comparing spectral, semantic, and structural complexity measures. The results suggest that semantic ambiguity and structural connectivity are more reliable indicators of KG difficulty than CSG alone.
+```bash
+python -m venv .venv
+```
 
+Activate it:
 
+```bash
+# Linux/macOS
+source .venv/bin/activate
 
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
 
+### 3. Install dependencies
 
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .
+```
 
-## Benchmark Results
+Optional FAISS acceleration:
 
-We report link prediction performance in terms of **MRR**, **Hits@1**, and **Hits@10** across multiple standard knowledge graph datasets.
+```bash
+pip install faiss-cpu
+```
 
-<details>
-<summary>Show benchmark performance table</summary>
+For GPU FAISS, install the version that matches your CUDA environment.
 
-| Model | WN18 MRR | WN18 H@1 | WN18 H@10 | FB15k-237 MRR | FB15k-237 H@1 | FB15k-237 H@10 | WN18RR MRR | WN18RR H@1 | WN18RR H@10 | YAGO3-10 MRR | YAGO3-10 H@1 | YAGO3-10 H@10 | CoDEx-M MRR | CoDEx-M H@1 | CoDEx-M H@10 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| DistMult | 0.824 | 0.726 | 0.9461 | 0.313 | 0.224 | 0.4901 | 0.433 | 0.397 | 0.5022 | 0.501 | 0.413 | 0.6612 | 0.379 | 0.328 | 0.479 |
-| ComplEx | 0.949 | 0.945 | 0.9550 | 0.349 | 0.257 | 0.5297 | 0.458 | 0.426 | 0.5212 | 0.576 | 0.505 | 0.7035 | 0.373 | 0.331 | 0.453 |
-| ANALOGY | 0.934 | 0.926 | 0.9442 | 0.202 | 0.126 | 0.3538 | 0.366 | 0.358 | 0.3800 | 0.283 | 0.192 | 0.4565 | 0.314 | 0.246 | 0.441 |
-| SimplE | 0.938 | 0.933 | 0.9458 | 0.179 | 0.100 | 0.3435 | 0.398 | 0.383 | 0.4265 | 0.453 | 0.356 | 0.6316 | 0.255 | 0.189 | 0.376 |
-| HolE | 0.938 | 0.931 | 0.9494 | 0.303 | 0.214 | 0.4764 | 0.432 | 0.403 | 0.4879 | 0.502 | 0.418 | 0.6519 | -- | -- | -- |
-| TuckER | 0.951 | 0.946 | 0.9580 | 0.352 | 0.259 | 0.5361 | 0.459 | 0.430 | 0.5140 | 0.544 | 0.466 | 0.6809 | 0.328 | 0.259 | 0.458 |
-| TransE | 0.646 | 0.406 | 0.9487 | 0.310 | 0.217 | 0.4965 | 0.206 | 0.028 | 0.5623 | 0.401 | 0.378 | 0.5739 | 0.435 | 0.368 | 0.562 |
-| STransE | 0.656 | 0.432 | 0.9345 | 0.315 | 0.225 | 0.4956 | 0.326 | 0.101 | 0.4221 | 0.049 | 0.328 | 0.0735 | -- | -- | -- |
-| CrossE | 0.834 | 0.733 | 0.9503 | 0.298 | 0.212 | 0.4705 | 0.405 | 0.381 | 0.4499 | 0.446 | 0.331 | 0.6545 | -- | -- | -- |
-| TorusE | 0.947 | 0.743 | 0.9544 | 0.281 | 0.196 | 0.4471 | 0.463 | 0.427 | 0.5335 | 0.342 | 0.274 | 0.4744 | -- | -- | -- |
-| RotatE | 0.949 | 0.943 | 0.9602 | 0.336 | 0.238 | 0.5306 | 0.475 | 0.426 | 0.5735 | 0.498 | 0.405 | 0.6707 | 0.478 | 0.418 | 0.593 |
-| ConvE | 0.945 | 0.939 | 0.9568 | 0.305 | 0.214 | 0.4762 | 0.427 | 0.390 | 0.5075 | 0.488 | 0.399 | 0.6575 | 0.318 | 0.239 | 0.464 |
-| ConvKB | 0.709 | 0.529 | 0.9489 | 0.230 | 0.140 | 0.4146 | 0.398 | 0.585 | 0.6525 | 0.420 | 0.322 | 0.6047 | -- | -- | -- |
-| ConvR | 0.950 | 0.946 | 0.9585 | 0.346 | 0.256 | 0.5263 | 0.4998 | 0.468 | 0.5987 | 0.4232 | 0.412 | 0.5766 | -- | -- | -- |
-| RSN | 0.928 | 0.912 | 0.9510 | 0.280 | 0.198 | 0.4444 | 0.498 | 0.399 | 0.5834 | 0.441 | 0.409 | 0.6043 | -- | -- | -- |
+## Dataset Format
 
-</details>
+Each dataset should be stored in a folder containing one or more of:
 
+```text
+train.txt
+valid.txt
+test.txt
+```
 
+Each line must contain one triple:
 
+```text
+head<TAB>relation<TAB>tail
+```
 
+Example:
 
+```text
+alice	works_at	university
+university	located_in	brunei
+```
 
+## Quick Start
 
+Run the example dataset:
 
+```bash
+kg-complexity summarize --data-dir examples/sample_kg --out results/sample_metrics.csv
+```
 
+Compute CSG with deterministic hash embeddings:
 
+```bash
+kg-complexity csg \
+  --data-dir examples/sample_kg \
+  --group-by tail \
+  --embedding-method hash \
+  --samples-per-class 3 \
+  --k-neighbors 3 \
+  --out-dir results/sample_csg
+```
 
-## How to cite:
+Train a small TransE model and compute relation-based CSG:
 
-If you use this repository, please cite:
+```bash
+kg-complexity transe-csg \
+  --data-dir examples/sample_kg \
+  --group-by relation \
+  --epochs 20 \
+  --samples-per-class 3 \
+  --k-neighbors 3 \
+  --out-dir results/sample_transe_csg
+```
+
+## Reproducing Paper-Style Experiments
+
+Place benchmark datasets such as `FB15k-237`, `WN18RR`, `CoDEx-S`, `CoDEx-M`, and `CoDEx-L` under a common folder:
+
+```text
+datasets/
+├── FB15k-237/
+│   ├── train.txt
+│   ├── valid.txt
+│   └── test.txt
+├── WN18RR/
+└── CoDEx-S/
+```
+
+Run structural and semantic metrics:
+
+```bash
+for d in datasets/*; do
+  name=$(basename "$d")
+  kg-complexity summarize \
+    --data-dir "$d" \
+    --name "$name" \
+    --out "results/${name}_metrics.csv"
+done
+```
+
+Run CSG with BERT embeddings:
+
+```bash
+kg-complexity csg \
+  --data-dir datasets/FB15k-237 \
+  --name FB15k-237 \
+  --group-by tail \
+  --embedding-method bert \
+  --model-name bert-base-uncased \
+  --samples-per-class 120 \
+  --k-neighbors 50 \
+  --out-dir results/FB15k-237_csg_bert
+```
+
+Run CSG with TransE embeddings:
+
+```bash
+kg-complexity transe-csg \
+  --data-dir datasets/FB15k-237 \
+  --name FB15k-237 \
+  --group-by relation \
+  --dim 100 \
+  --epochs 50 \
+  --samples-per-class 120 \
+  --k-neighbors 50 \
+  --out-dir results/FB15k-237_transe_csg
+```
+
+## Main CLI Commands
+
+### `summarize`
+
+Computes semantic and structural metrics.
+
+```bash
+kg-complexity summarize --data-dir DATASET_DIR --out results/metrics.csv
+```
+
+### `csg`
+
+Computes CSG using concatenated `(head, relation)` text embeddings. Use `--embedding-method hash` for quick deterministic runs or `--embedding-method bert` for transformer-derived semantic embeddings.
+
+```bash
+kg-complexity csg --data-dir DATASET_DIR --embedding-method bert
+```
+
+### `transe-csg`
+
+Trains TransE embeddings and computes CSG over relation or tail classes.
+
+```bash
+kg-complexity transe-csg --data-dir DATASET_DIR --group-by relation
+```
+
+## Output Files
+
+The commands write CSV/TXT outputs to `results/`:
+
+```text
+results/
+├── *_metrics.csv
+├── csg_results.csv
+├── csg_eigenvalues.txt
+├── csg_similarity_matrix.csv
+├── transe_csg_results.csv
+├── transe_csg_eigenvalues.txt
+└── transe_csg_similarity_matrix.csv
+```
+
+## Notes on the Recovered Legacy Code
+
+The original scripts in `legacy/` are included exactly as recovered. They contain hard-coded local paths from the original machine and may require editing before direct execution. The portable implementation in `src/kg_complexity/` replaces those hard-coded paths with command-line arguments and adds a dependency-managed package structure suitable for GitHub.
+
+## Citation
+
+If you use this code, please cite the paper:
 
 ```bibtex
-@INPROCEEDINGS{11401467,
+@inproceedings{gul2025kgcomplexity,
+  title={Evaluating Knowledge Graph Complexity via Semantic, Spectral, and Structural Metrics for Link Prediction},
   author={Gul, Haji and Naim, Abdul Ghani and Bhat, Ajaz Ahmad},
   booktitle={2025 IEEE International Conference on Big Data (BigData)},
-  title={Evaluating Knowledge Graph Complexity via Semantic, Spectral, and Structural Metrics for Link Prediction},
-  year={2025},
-  pages={2833-2842},
-  keywords={Correlation;Sensitivity;Semantics;Knowledge graphs;Predictive models;Performance metrics;Entropy;Data models;Complexity theory;Standards;Knowledge Graph Complexity; Link Prediction; CSG; Semantic Ambiguity;Structural Connectivity;Dataset Difficulty},
-  doi={10.1109/BigData66926.2025.11401467}
+  year={2025}
 }
+```
+
+## Testing
+
+```bash
+pip install pytest
+pytest
+```
+
+## Troubleshooting
+
+### BERT model download fails
+
+The first BERT run downloads model files from Hugging Face. Make sure you have internet access, or use:
+
+```bash
+kg-complexity csg --data-dir examples/sample_kg --embedding-method hash
+```
+
+### FAISS is not installed
+
+The package automatically falls back to scikit-learn nearest neighbors if FAISS is unavailable.
+
+### CUDA runs out of memory
+
+Use CPU mode or reduce batch size:
+
+```bash
+kg-complexity csg --data-dir datasets/FB15k-237 --embedding-method bert --device cpu --batch-size 16
+```
+
+## License
+
+MIT License.
